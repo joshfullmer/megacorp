@@ -1,27 +1,56 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div class="flex flex-col">
+    <Stats />
+    <AddResourceButton class="action-button" />
+    <AddWorkerButton class="action-button" />
+    <AddManagerButton class="action-button" />
+    <AddOfficeButton class="action-button" />
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import {
+  defineComponent, onMounted
+} from 'vue'
+
+import AddResourceButton from './components/buttons/AddResourceButton.vue'
+import AddManagerButton from './components/buttons/AddManagerButton.vue'
+import AddOfficeButton from './components/buttons/AddOfficeButton.vue'
+import AddWorkerButton from './components/buttons/AddWorkerButton.vue'
+import Stats from './components/Stats.vue'
+
+import { useGameState } from './state/game.state'
 
 export default defineComponent({
   name: 'App',
   components: {
-    HelloWorld,
+    AddManagerButton,
+    AddOfficeButton,
+    AddResourceButton,
+    AddWorkerButton,
+    Stats
   },
-});
+  setup () {
+    const { gameTick } = useGameState()
+
+    let last = 0
+    const loop = (timestamp: number) => {
+      const secondsSinceLast = (timestamp - last) / 1000
+
+      last = timestamp
+
+      gameTick(secondsSinceLast)
+
+      requestAnimationFrame(loop)
+    }
+
+    onMounted(() => loop(last))
+  }
+})
 </script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss" scoped>
+  .action-button {
+    @apply my-2;
+  }
 </style>
